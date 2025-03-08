@@ -1,2 +1,5 @@
-mcp
 pixeltable
+mcp
+httpx
+uvicorn
+starlette

@@ -5,15 +5,36 @@ This is a simple MCP (Model-Client-Protocol) server that wraps around the Pixelt
 ## Clone the repo
 `gh repo clone pixeltable/mcp-server-pixeltable`
 
-## Installation
+## Docker Setup
+
+### Build the Docker image
+```bash
+docker build -t pixeltable-mcp-server .
+```
+
+### Run the Docker container
+```bash
+docker run -p 8080:8080 pixeltable-mcp-server
+```
+
+This will start the MCP server on port 8080, making it accessible at `http://localhost:8080`.
+
+## Add the tool to Cursor
+1. Go to Cursor settings
+2. Add MCP > Add Name > Type = 'Command'
+3. For the URL, enter: `http://localhost:8080/sse`
+
+## Alternative: Local Installation
+
+If you prefer to run the server locally without Docker:
 
 ```bash
 pip install pixeltable mcp
 ```
 
-## Add the tool to cursor
-1. Go to cursor settings
-2. Add MCP > Add Name > Type = 'Command'
-3. Command: `python ~\mcp-server-pixeltable\server.py`
+Then run the server:
+```bash
+python server.py
+```
 
 Note this assumes you install at the global python level.
