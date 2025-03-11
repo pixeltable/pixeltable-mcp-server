@@ -2,7 +2,7 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# FFmpeg and build-essential are required for audio processing
+# FFmpeg and build-essential are required for video processing
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     build-essential \
@@ -19,11 +19,11 @@ RUN python -m spacy download en_core_web_sm
 COPY server.py .
 COPY tools.py .
 
-# Create directory for audio files
-RUN mkdir -p /app/audio_index
+# Create directory for documents
+RUN mkdir -p /app/doc_index
 
 # Expose the port the app runs on
-EXPOSE 8080
+EXPOSE 8083
 
 # Command to run the application
-CMD ["python", "server.py", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["python", "server.py", "--host", "0.0.0.0", "--port", "8083"]

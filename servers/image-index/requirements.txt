@@ -1,7 +1,7 @@
 pixeltable
 tiktoken
-openai-whisper
-spacy 
+openai
+spacy
 sentence-transformers
 mcp
 httpx
