@@ -50,7 +50,7 @@ git clone https://github.com/pixeltable/mcp-server-pixeltable.git
 cd mcp-server-pixeltable/servers
 
 docker-compose up --build                 # Run locally with docker-compose
-docker-compose down                       # Tear down resources
+docker-compose down                       # Take down resources
 ```
 
 ## 🔧 Configuration
