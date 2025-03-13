@@ -1,7 +1,7 @@
 # Multimodal Model Context Protocal Server
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10+-blue.svg" alt="Python Version">
+  <img src="https://img.shields.io/badge/Python-3.9+-blue.svg" alt="Python Version">
   <img src="https://img.shields.io/badge/License-Apache_2.0-green.svg" alt="License">
   <img src="https://img.shields.io/badge/Status-Beta-yellow.svg" alt="Status">
 </p>
