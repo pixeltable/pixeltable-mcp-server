@@ -3,61 +3,67 @@ import pixeltable as pxt
 from pixeltable.functions import openai
 from pixeltable.functions.huggingface import sentence_transformer
 from pixeltable.functions.video import extract_audio
-from pixeltable.iterators import AudioSplitter
+from pixeltable.iterators import AudioSplitter, FrameIterator
 from pixeltable.iterators.string import StringSplitter
+from pixeltable.functions.openai import vision
 
-DIRECTORY = 'video_index'
-TABLE_NAME = f'{DIRECTORY}.video'
-CHUNKS_VIEW_NAME = f'{DIRECTORY}.video_chunks'
-SENTENCES_VIEW_NAME = f'{DIRECTORY}.video_sentence_chunks'
-WHISPER_MODEL = 'whisper-1'
-DELETE_INDEX = True
+EMBED_MODEL = sentence_transformer.using(model_id='intfloat/e5-large-v2')
 
-if DELETE_INDEX and TABLE_NAME in pxt.list_tables():
-    pxt.drop_dir(DIRECTORY, force=True)
+# Set to True to delete existing index
+directory = 'video_index'
+table_name = f'{directory}.video'
 
-if TABLE_NAME not in pxt.list_tables():
-    # Create video table
-    pxt.create_dir(DIRECTORY, if_exists='ignore')
-    video_index = pxt.create_table(TABLE_NAME, {'video': pxt.Video, 'uploaded_at': pxt.Timestamp})
+# Create video table
+pxt.create_dir(directory, if_exists='replace_force')
+video_index = pxt.create_table(table_name, {'video': pxt.Video, 'uploaded_at': pxt.Timestamp})
+video_index.add_computed_column(audio_extract=extract_audio(video_index.video, format='mp3')) 
 
-    # Video-to-audio
-    video_index.add_computed_column(audio_extract=extract_audio(video_index.video, format='mp3'))
-
-    # Create view for audio chunks
-    chunks_view = pxt.create_view(
-        CHUNKS_VIEW_NAME,
-        video_index,
-        iterator=AudioSplitter.create(
-            audio=video_index.audio_extract,
-            chunk_duration_sec=30.0,
-            overlap_sec=2.0,
-            min_chunk_duration_sec=5.0
-        )
+# Create view for frames
+frames_view = pxt.create_view(
+    f'{directory}.video_frames',
+    video_index,
+    iterator=FrameIterator.create(
+        video=video_index.video,
+        fps=1
     )
+)
 
-    # Audio-to-text for chunks
-    chunks_view.add_computed_column(
-        transcription=openai.transcriptions(audio=chunks_view.audio_chunk, model=WHISPER_MODEL)
+frames_view.add_computed_column(
+    image_description=vision(
+        prompt="Provide quick caption for the image.",
+        image=frames_view.frame,
+        model="gpt-4o-mini"
     )
+)    
 
-    # Create view that chunks text into sentences
-    transcription_chunks = pxt.create_view(
-        SENTENCES_VIEW_NAME,
-        chunks_view,
-        iterator=StringSplitter.create(text=chunks_view.transcription.text, separators='sentence'),
+frames_view.add_embedding_index('image_description', string_embed=EMBED_MODEL)    
+
+# Create view for audio chunks
+chunks_view = pxt.create_view(
+    f'{directory}.video_chunks',
+    video_index,
+    iterator=AudioSplitter.create(
+        audio=video_index.audio_extract,
+        chunk_duration_sec=30.0,
+        overlap_sec=2.0,
+        min_chunk_duration_sec=5.0
     )
+)
 
-    # Define the embedding model
-    embed_model = sentence_transformer.using(model_id='intfloat/e5-large-v2')
+# Audio-to-text for chunks
+chunks_view.add_computed_column(
+    transcription=openai.transcriptions(audio=chunks_view.audio_chunk, model='whisper-1')
+)
 
-    # Create embedding index
-    transcription_chunks.add_embedding_index('text', string_embed=embed_model)
+# Create view that chunks text into sentences
+transcription_chunks = pxt.create_view(
+    f'{directory}.video_sentence_chunks',
+    chunks_view,
+    iterator=StringSplitter.create(text=chunks_view.transcription.text, separators='sentence'),
+)
 
-else:
-    video_index = pxt.get_table(TABLE_NAME)
-    chunks_view = pxt.get_table(CHUNKS_VIEW_NAME)
-    transcription_chunks = pxt.get_table(SENTENCES_VIEW_NAME)
+# Create embedding index
+transcription_chunks.add_embedding_index('text', string_embed=EMBED_MODEL)
 
 # Insert Videos
 videos = [
@@ -68,12 +74,25 @@ videos = [
 
 video_index.insert({'video': video, 'uploaded_at': datetime.now()} for video in videos[:2])
 
-# Query the table
-sim = transcription_chunks.text.similarity('What is happiness?')
+# Get similarity scores
+audio_sim = transcription_chunks.text.similarity('What is happiness?')
+image_sim = frames_view.image_description.similarity('Black Suit')
 
-print(
-    transcription_chunks.order_by(sim, transcription_chunks.uploaded_at, asc=False)
+# Fetch 5 most similar audio chunks
+audio_results = (
+    transcription_chunks.order_by(audio_sim, transcription_chunks.uploaded_at, asc=False)
     .limit(5)
-    .select(transcription_chunks.text, transcription_chunks.uploaded_at, similarity=sim)
+    .select(transcription_chunks.text, transcription_chunks.uploaded_at, similarity=audio_sim)
     .collect()
 )
+
+# Fetch 5 most similar frames
+frame_results = (
+    frames_view.order_by(image_sim, frames_view.uploaded_at, asc=False)
+    .limit(5)
+    .select(frames_view.image_description, frames_view.uploaded_at, similarity=image_sim)
+    .collect()
+)
+
+print(audio_results)
+print(frame_results)
