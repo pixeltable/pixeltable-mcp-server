@@ -46,9 +46,11 @@ Located in `servers/base-sdk/`, this server provides:
 ```bash
 pip install pixeltable
 git clone https://github.com/pixeltable/mcp-server-pixeltable.git
-cd mcp-server-pixeltable
-pip install -r servers/*/requirements.txt  # Install dependencies for each service
+
+cd mcp-server-pixeltable/servers
+
 docker-compose up --build                 # Run locally with docker-compose
+docker-compose down                       # Tear down resources
 ```
 
 ## 🔧 Configuration
