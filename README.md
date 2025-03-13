@@ -1,4 +1,4 @@
-# Multimodal MCP Server built using Pixeltable
+# Multimodal Model Context Protocal Server
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10+-blue.svg" alt="Python Version">
