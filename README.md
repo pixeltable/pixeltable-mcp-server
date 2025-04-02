@@ -1,4 +1,4 @@
-# Multimodal Model Context Protocal Server
+# Multimodal Model Context Protocol Server
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.9+-blue.svg" alt="Python Version">
