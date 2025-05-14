@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/pixeltable-pixeltable-mcp-server-badge.png)](https://mseep.ai/app/pixeltable-pixeltable-mcp-server)
+
 # Multimodal Model Context Protocol Server
 
 <p align="center">
