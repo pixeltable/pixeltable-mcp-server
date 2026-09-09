@@ -1,70 +1,54 @@
-# Multimodal Model Context Protocol Server
+# Pixeltable MCP Server (moved)
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.9+-blue.svg" alt="Python Version">
-  <img src="https://img.shields.io/badge/License-Apache_2.0-green.svg" alt="License">
-  <img src="https://img.shields.io/badge/Status-Beta-yellow.svg" alt="Status">
-</p>
+> **This repository is no longer maintained.**
+> The Pixeltable MCP server now lives at
+> **[pixeltable/mcp-server-pixeltable-developer](https://github.com/pixeltable/mcp-server-pixeltable-developer)**.
 
-This repository contains a collection of server implementations for Pixeltable, designed to handle multimodal data indexing and querying (audio, video, images, and documents). These services are orchestrated using Docker for local development.
+That is the server to install if you want Pixeltable available to Claude Code, Claude Desktop,
+Cursor, or any other MCP client: 35 tools, 13 resources, and 11 prompts covering catalog
+management, AI/ML pipelines, dependency installation, project scaffolding, and a persistent
+Python REPL.
 
-## 🚀 Available Servers
+## Install the maintained server
 
-### Audio Index Server
-Located in `servers/audio-index/`, this server provides:
-- Audio file indexing with transcription capabilities
-- Semantic search over audio content
-- Multi-index support for audio collections
-- Accessible at `/audio` endpoint
+Requires [`uv`](https://docs.astral.sh/uv/getting-started/installation/):
 
-### Video Index Server
-Located in `servers/video-index/`, this server provides:
-- Video file indexing with frame extraction
-- Content-based video search
-- Accessible at `/video` endpoint
-
-### Image Index Server
-Located in `servers/image-index/`, this server provides:
-- Image indexing with object detection
-- Similarity search for images
-- Accessible at `/image` endpoint
-
-### Document Index Server
-Located in `servers/doc-index/`, this server provides:
-- Document indexing with text extraction
-- Retrieval-Augmented Generation (RAG) support
-- Accessible at `/doc` endpoint
-
-### Base SDK Server
-Located in `servers/base-sdk/`, this server provides:
-- Core functionality for Pixeltable integration
-- Foundation for building specialized servers
-
-## 📦 Installation
-
-### Local Development
 ```bash
-pip install pixeltable
-git clone https://github.com/pixeltable/mcp-server-pixeltable.git
-
-cd mcp-server-pixeltable/servers
-
-docker-compose up --build                 # Run locally with docker-compose
-docker-compose down                       # Take down resources
+uv tool install --from git+https://github.com/pixeltable/mcp-server-pixeltable-developer.git mcp-server-pixeltable-developer
+claude mcp add pixeltable mcp-server-pixeltable-developer   # Claude Code
 ```
 
-## 🔧 Configuration
-- Each service runs on its designated port (8080 for audio, 8081 for video, 8082 for image, 8083 for doc).
-- Configure service settings in the respective Dockerfile or through environment variables.
+Claude Desktop, Cursor, and from-source configuration are covered in the
+[new repository's README](https://github.com/pixeltable/mcp-server-pixeltable-developer#readme).
 
-## 🔗 Links
-- [Pixeltable GitHub](https://github.com/pixeltable)
-- [Pixeltable Documentation](https://docs.pixeltable.com)
-- [Discord Community](https://discord.gg/pixeltable)
+File issues and feature requests at
+[mcp-server-pixeltable-developer/issues](https://github.com/pixeltable/mcp-server-pixeltable-developer/issues).
 
-## 📞 Support
-- GitHub Issues: [Report bugs or request features](https://github.com/pixeltable/mcp-server-pixeltable/issues)
-- Discord: Join our [community](https://discord.gg/pixeltable)
+## What used to be here
 
-## 📜 License
-This project is licensed under the Apache 2.0 License.
+`servers/` still holds the original Docker Compose prototype: four separate index servers for
+audio, video, images, and documents, plus a base SDK server. It is kept for reference only. It
+targets an older Pixeltable release, receives no updates, and is superseded by the single
+server above.
+
+<details><summary>Original instructions</summary>
+
+```bash
+pip install pixeltable
+git clone https://github.com/pixeltable/pixeltable-mcp-server.git
+cd pixeltable-mcp-server/servers
+docker-compose up --build     # audio 8080, video 8081, image 8082, doc 8083
+docker-compose down
+```
+
+</details>
+
+## Links
+
+- [Pixeltable docs](https://docs.pixeltable.com)
+- [Pixeltable on GitHub](https://github.com/pixeltable)
+- [Discord community](https://discord.gg/pixeltable)
+
+## License
+
+Apache 2.0.
